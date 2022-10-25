@@ -181,19 +181,37 @@ In this tutorial, we'll mostly focus on symmetric ciphers. One common use case f
 
 ### Modes of Operation
 
-AES block ciphers can operate in a variety of modes. Let's take a look at some of the most common:
+AES block ciphers can operate in a variety of _modes_, which describe how multi-block messages interact with AES. Let's take a look at some of the most common:
 
 - ECB (Electronic Code Book; `AES.MODE_ECB`)
   
   In ECB mode, the AES cipher is simply applied to each block with the given key, without any modifications. ECB is the simplest out of the block cipher modes. One drawback of ECB is that the same plaintext block will always encrypt to the same ciphertext block. Thus, for files with lots of repeated contents, it becomes much easier to cryptanalyze.
 
+  ![ECB mode of operation](ecb.png)
+
 - CBC (Cipher Block Chaining; `AES.MODE_CBC`)
 
-  In CBC mode, the encrypted block is XORed with the plaintext of the next block before the next block is encrypted. CBC helps avoid the issue of having the same plaintext blocks mapping to the same ciphertext blocks through this XOR process.
+  In CBC mode, the encrypted block is XORed with the plaintext of the next block before the next block is encrypted. CBC helps avoid the issue of having the same plaintext blocks mapping to the same ciphertext blocks through this XOR process. To encrypt the first block, the first plaintext block is XORed with an _initialization value_ (IV).
+
+  ![CBC mode of operation](cbc.png)
 
 - CTR (Counter; `AES.MODE_CTR`)
 
   CTR mode turns AES into a _stream cipher_, where a key is used to generate a sequence (or stream) that is used to encrypt the message (typically through XOR). This stream can be extended out to any length. In CTR mode, we utilize a _nonce_ value, which is concatenated with the block index (as a bytestring). This combined string is then encrypted using AES with the given key to give a part of the stream. To generate additional blocks, the block index is simply updated and the encrypted value re-computed.
+
+  ![CTR mode of operation](ctr.png)
+
+- CFB (Cipher Feedback; `AES.MODE_CFB`)
+
+  CFB utilizes the stream cipher design of CTR mode, but rather than using an incrementing input value, utilizes the previous ciphertext block as the input to AES. The result is then XORed with the current plaintext block to produce a ciphertext block. For the first block, similar to CBC, we use an initialization value.
+
+  ![CFB mode of operation](cfb.png)
+
+- OFB (Output Feedback; `AES.MODE_OFB`)
+
+  OFB builds up a very similar design to CFB, except that rather than using the encrypted block as the "initialization value" in the next block, the result of the AES cipher is used. This creates a stream cipher that is independent of the input, and is solely dependent on the initialization value, similar to CTR mode.
+
+  ![OFB mode of operation](ofb.png)
 
 ### Running AES
 
@@ -284,7 +302,7 @@ For decryption, all that needs to be done is replace `encrypt` with `decrypt`!
 
 Now that we've covered AES, check out [advanced onion standard](advancedonionstandard/challenge.md)
 
-## Section 4: RSA
+## Section 4: RSA Challenges
 
 Before ending this tutorial, I'll go over a few of the various functions used by RSA challenges. Let's take a look at a relatively standard RSA implementation:
 
@@ -318,6 +336,8 @@ inverse(e, n): takes the inverse of `e` modulo `n`.
 ```
 
 Having a general knowledge of `pycryptodome` helps when quickly analyzing RSA-based challenges; in my experience, it's one of the most popular libraries in RSA challenges for the ability to quickly generate primes and convert between strings and integers.
+
+Let's take a look at a simple RSA challenge: [mrsa](mrsa/challenge.md).
 
 ## Section 5: The End
 
