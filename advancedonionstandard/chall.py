@@ -27,6 +27,7 @@ m1 = b'unrelated message that definitely won\'t help you get the flag at all, of
 flag = open('.secret/flag', 'rb').read()
 
 m1 = pad(m1, 16)
+print(len(m1))
 flag = pad(flag, 16)
 
 print(encrypt_round3(m1, key3, nonce).hex())
